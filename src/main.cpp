@@ -3,7 +3,6 @@
 #include <Adafruit_NeoPixel.h>
 #include <FastBot.h>
 #include <ESP8266HTTPClient.h>
-
 #include <TimeLib.h>
 #include <TimeAlarms.h>
 #include <NTPClient.h>
@@ -14,9 +13,9 @@ const char *ssid = WIFI_SSID;
 const char *password = WIFI_PASSWORD;
 
 #define DEBUG
-// Определение пина для светодиода
+// LED pin definition
 // const int ledPin = 2;
-#define OffsetTime 5 * 60 * 60 // разница с UTC
+#define OffsetTime 5 * 60 * 60 // difference with UTC
 
 #define ENCODER_PIN_A D1
 #define ENCODER_PIN_B D2
@@ -60,8 +59,8 @@ Adafruit_NeoPixel strip(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
 const int pwmPin = D4;
 // const int pwmPin2 = D0;
-const int pwmFrequency = 10000; // Частота ШИМ в герцах
-const int pwmResolution = 8;    // Разрешение ШИМ (8 бит)
+const int pwmFrequency = 10000; // PWM frequency in Hz
+const int pwmResolution = 8;    // PWM resolution (8 bit)
 volatile int encoderPos = 0;
 volatile boolean encoderButtonPressed = false;
 volatile boolean encoderButtonReleased = false;
@@ -234,7 +233,7 @@ void loop()
 
   eb.tick();
 
-  if (eb.turn()) // крутим крутилку
+  if (eb.turn()) // rotating encoder
   {
 #ifdef DEBUG
     Serial.print("turn: dir ");
@@ -261,10 +260,10 @@ void loop()
 
     gammaCorrectedValue = gammaCorrection(bright); // Применение гамма-коррекции
 
-    if (gammaCorrectedValue >= 232) // докрутили до минимума
+    if (gammaCorrectedValue >= 232) // reached minimum
     {
       State = STATE_OFF;
-      digitalWrite(DC_DC_EN, 0); // ВЫКЛ DC-DC
+      digitalWrite(DC_DC_EN, 0); // DC-DC OFF
       strip.setPixelColor(0, strip.Color(5, 0, 0));
       strip.setPixelColor(1, strip.Color(5, 0, 0));
 
@@ -319,7 +318,7 @@ void loop()
 #endif
     if (State == STATE_ON_AUTO || State == STATE_ON_AUTO_SLOW || State == STATE_ON_MANUAL)
     {
-      State = STATE_OFF_AUTO; // запуск автоматического выключения
+      State = STATE_OFF_AUTO; // start automatic shutdown
       strip.setPixelColor(0, strip.Color(127, 0, 0));
       strip.setPixelColor(1, strip.Color(127, 0, 0));
       strip.show();
@@ -361,7 +360,7 @@ void loop()
 #endif
   }
 
-  if (State == STATE_OFF_AUTO) //---------------------------------------------------------- АВТОМАТИЧЕСКОЕ ВЫКЛЮЧЕНИЕ ----------------------------
+  if (State == STATE_OFF_AUTO) //---------------------------------------------------------- AUTOMATIC SHUTDOWN ----------------------------
   {
     bright = bright_temp + (millis() - time_cur) / 50;
 
@@ -743,20 +742,20 @@ void init_telegram(void)
   bot.sendMessage(timeClient.getFormattedTime(), idAdmin1);
 }
 
-void OffLEDBLUE(void) // Выключить светодиод LED1 COM
+void OffLEDBLUE(void) // Turn off LED1 COM
 {                     // turn the LED off (HIGH is the voltage level)
   digitalWrite(LED_BUILTIN, HIGH);
-} // запись 1 в порт синего светодиода
-void OnLEDBLUE(void) // Включить светодиод LED1
+} // write 1 to blue LED port
+void OnLEDBLUE(void) // Turn on LED1
 {                    // turn the LED on by making the voltage LOW
   digitalWrite(LED_BUILTIN, LOW);
 } // запись 0 в порт синего светодиода
 
-void OffLEDBLUE2(void) // Выключить светодиод LED2 WAKE
+void OffLEDBLUE2(void) // Turn off LED2 WAKE
 {                      // turn the LED off (HIGH is the voltage level)
   digitalWrite(LED_BUILTIN_AUX, HIGH);
-} // запись 1 в порт синего светодиода
-void OnLEDBLUE2(void) // Включить светодиод LED2
+} // write 1 to blue LED port
+void OnLEDBLUE2(void) // Turn on LED2
 {                     // turn the LED on by making the voltage LOW
   digitalWrite(LED_BUILTIN_AUX, LOW);
 } // запись 0 в порт синего светодиода
